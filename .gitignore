@@ -1,0 +1,5 @@
+migrations
+venv
+.env
+media_files
+__pycache__
