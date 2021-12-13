@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+  
+{% block content %}
+
+{% if property_details %}
+
+  <section id="showcase-inner" class="py-5 bg-secondary text-white">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-12">
+          <h1 class="display-4">{{property_details.address}}, {{property_details.city}}</h1>
+          <p class="lead">
+            <i class="fas fa-map-marker"></i> {{property_details.state}}, {{property_details.zipcode}}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- property -->
+  <section id="property" class="py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <!-- Home Main Image -->
+          <img src="{{ property_details.photo_main.url }}" alt="" class="img-main img-fluid mb-3">
+          <!-- Thumbnails -->
+          <div class="row mb-5 thumbs">
+            <div class="col-md-2">
+              <a href="{{ property_details.photo_1.url }}" data-lightbox="home-images">
+                <img src="{{ property_details.photo_1.url }}" alt="" class="img-fluid">
+              </a>
+            </div>
+            <div class="col-md-2">
+              <a href="{{ property_details.photo_2.url }}" data-lightbox="home-images">
+                <img src="{{ property_details.photo_2.url }}" alt="" class="img-fluid">
+              </a>
+            </div>
+            <div class="col-md-2">
+              <a href="{{ property_details.photo_3.url }}" data-lightbox="home-images">
+                <img src="{{ property_details.photo_3.url }}" alt="" class="img-fluid">
+              </a>
+            </div>
+          </div>
+          <!-- Fields -->
+          <div class="row mb-5 fields">
+            <div class="col-md-6">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item text-secondary">
+                  <i class="fas fa-money-bill-alt"></i> Asking Price:
+                  <span class="float-right">$ {{ property_details.price }}</span>
+                </li>
+                <li class="list-group-item text-secondary">
+                  <i class="fas fa-bed"></i> Bedrooms:
+                  <span class="float-right">{{ property_details.bedrooms }}</span>
+                </li>
+                <li class="list-group-item text-secondary">
+                  <i class="fas fa-bath"></i> Bathrooms:
+                  <span class="float-right">{{ property_details.bathrooms }}</span>
+                </li>
+                <li class="list-group-item text-secondary">
+                  <i class="fas fa-car"></i> Garage:
+                  <span class="float-right">{{ property_details.garage }}
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item text-secondary">
+                  <i class="fas fa-th-large"></i> Square Feet:
+                  <span class="float-right">{{ property_details.sqft }}</span>
+                </li>
+                <li class="list-group-item text-secondary">
+                  <i class="fas fa-calendar"></i> Property Date:
+                  <span class="float-right">{{ property_details.property_date }}</span>
+                </li>
+                <li class="list-group-item text-secondary">
+                  <i class="fas fa-bed"></i> Seller:
+                  <span class="float-right" id="seller_name">{{ property_details.name }}
+                  </span>
+                </li>
+
+              </ul>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="row mb-5">
+            <div class="col-md-12">
+              {{ property_details.description }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Button trigger modal -->
+  <div class="container pb-5">
+  <div class="d-grid gap-2">
+  <button type="button" class="btn btn-primary" id="get_contact" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Get Seller Contact
+  </button>
+  </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Seller Contact Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="contact_modal">
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.getElementById("get_contact").addEventListener("click", function() {
+      var name = document.getElementById("seller_name");
+      var seller_name = name.textContent.trim();
+      var data = {
+        seller_name
+      };
+      $.ajax({
+        type: "GET",
+        url: "{% url 'get_contact' %}",
+        data: data,
+        beforeSend: function(){
+          var spinner = '<div class="spinner-border text-dark" role="status"></div>'
+          $('#contact_modal').html(spinner);
+        },
+        success: function(data) {
+          if (data.status === true){
+            var contact_modal = document.getElementById("contact_modal");
+            var html_content = `<ul class="list-group list-group-flush">
+                                <li  class="list-group-item text-secondary" >Name: ${data.seller_name}</li>
+                                <li  class="list-group-item text-secondary">Email ID.: ${data.seller_email}</li>
+                                <li  class="list-group-item text-secondary">Contact No.: ${data.seller_contact}</li>
+                                </ul>`;
+            contact_modal.innerHTML = html_content;
+          }
+          else{
+            var contact_modal = document.getElementById("contact_modal");
+            if (data.message === 'Login'){
+              var html_content = `<h5 class='text-center'>Please login to view the contact</h5><br>
+                                  <div class="d-grid gap-2 col-6 mx-auto">
+                                    <a href="https://realestateproject.auth.us-east-1.amazoncognito.com/login?client_id=igrhu8uncn8e6ljda1g3th34m&response_type=code&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=https://127.0.0.1:8000" class="btn btn-primary align-center">Login</a>
+                                  </div>`;
+            }
+            else{
+            var html_content = `<h5 class='text-center'>${data.message}</h5>`;
+            }
+            contact_modal.innerHTML = html_content;
+          }
+        }
+      });
+    });
+  </script>
+{% endif %}
+
+{% endblock %}

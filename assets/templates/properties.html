@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+  
+{% block content %}
+
+  <section id="showcase-inner" class="py-5 bg-secondary text-white">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-12">
+          <h1 class="display-4">Hurry..Own your Property</h1>
+          <p class="lead">We sell at cheaper rates $</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- properties -->
+  <section id="properties" class="py-4">
+    <div class="container">
+      <div class="row">
+      {% if property_list %}
+      {% for property in property_list %}
+        <!-- property 1 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card property-preview">
+            <img class="card-img-top" src="{{ property.photo_main.url }}" alt="">
+            <div class="card-body">
+              <div class="property-heading text-center">
+                <h4 class="text-primary">{{property.address}}, {{property.city}}</h4>
+                <p>
+                  <i class="fas fa-map-marker text-secondary"></i> {{property.state}}, {{property.zipcode}}</p>
+              </div>
+              <hr>
+              <div class="row py-2 text-secondary">
+                <div class="col-6">
+                  <i class="fas fa-th-large"></i> Sqft: {{property.sqft}}</div>
+                <div class="col-6">
+                  <i class="fas fa-car"></i> Garage: {{property.garage}}</div>
+              </div>
+              <div class="row py-2 text-secondary">
+                <div class="col-6">
+                  <i class="fas fa-bed"></i> Bedrooms: {{property.bedrooms}}</div>
+                <div class="col-6">
+                  <i class="fas fa-bath"></i> Bathrooms: {{property.bathrooms}}</div>
+              </div>
+              <hr>
+              <div class="row py-2 text-secondary">
+                <div class="col-12">
+                  <i class="fas fa-user"></i> {{property.name}}</div>
+              </div>
+              <div class="row text-secondary pb-2">
+                <div class="col-6">
+                  <i class="fas fa-clock"></i> {{property.days}}</div>
+              </div>
+               <div class="row text-secondary pb-2">
+                <div class="col-6">
+                   <i class="fas fa-dollar-sign"></i> {{property.price}}</div>
+              </div>
+              <hr>
+              <a href="{% url 'property_detail' property.id %}" class="btn btn-primary btn-block">More Info</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      {% endif %}
+      </div>
+    </div>
+  </section>
+{% endblock %}
